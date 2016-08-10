@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>{% block title %}{% endblock %}</title>
+
+  <!-- Including links to jquery and bootstrap in parent file -->
+  <script src ='https://code.jquery.com/jquery.js'></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Show flashed messages -->
+{% with messages = get_flashed_messages() %}
+   {% if messages %}
+      {% for message in messages %}
+         {{ message }}
+      {% endfor %}
+   {% endif %}
+{% endwith %}
+
+<!-- Insert body text here -->
+{% block content %} put your content here {% endblock %}
+
+</body>
+</html>
