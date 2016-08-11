@@ -11,8 +11,10 @@ def load_opentable():
 
     print "Loading Opentable data"
 
+    #Delete all rows in table to reseed data every time this function is called
     Opentable.query.delete()
 
+    #Read the source file and insert data, use 'rU' so \r is read as line break
     for line in open('data/opentable.txt','rU'):
         line = line.rstrip()
         opentable_id, reserve_url, price, address, phone, lat, lng, image_url, name = line.split('|')
@@ -27,17 +29,19 @@ def load_opentable():
                               image_url=image_url,
                               name=name)
 
+        #add opentable info to the database
         db.session.add(opentable)
 
+    #commit work
     db.session.commit()
 
 
 def load_restaurants():
-    """Load restaurants into database from restaurant.csv file"""
+    """Load restaurants into database from restaurant.txt file"""
 
     print "Loading Restaurants"
 
-    #Delete all rows in table to reseed data every time this function si called
+    #Delete all rows in table to reseed data every time this function is called
     Restaurant.query.delete()
 
     #Read the source file and insert data, use 'rU' so \r is read as line break

@@ -9,6 +9,7 @@ from flask import (Flask, render_template, redirect, request, flash,
 from model import Restaurant, Opentable, connect_to_db, db
 from flask_sqlalchemy import SQLAlchemy
 
+
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -23,6 +24,8 @@ def index():
     """Homepage."""
 
     return render_template("homepage.html")
+
+
 
 
 if __name__ == "__main__":

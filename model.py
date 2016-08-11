@@ -28,10 +28,6 @@ class Restaurant(db.Model):
     def __repr__(self):
         return "<Restaurant opentable=%i name=%s>" % (self.opentable_id, self.name)
 
-    #define relationship between tables
-    opentable = db.relationship('Opentable',
-                                backref=db.backref('restaurants'))
-
 
 class Opentable(db.Model):
     """Table containing additional information from opentable"""
@@ -40,7 +36,7 @@ class Opentable(db.Model):
 
     opentable_id = db.Column(db.Integer, unique=True, nullable=True, primary_key=True)
     reserve_url = db.Column(db.String(100), nullable=True)
-    price = db.Column(db.Integer, nullable=True) 
+    price = db.Column(db.Integer, nullable=True)
     address = db.Column(db.String(100), nullable=True)
     phone = db.Column(db.String(15), nullable=True)
     lat = db.Column(db.Float, nullable=True)
@@ -51,6 +47,27 @@ class Opentable(db.Model):
     #return details on object in terminal
     def __repr__(self):
         return "<Restaurant opentable=%i name=%s>" % (self.opentable_id, self.name)
+
+
+    #define relationship between tables
+    restaurants = db.relationship('Restaurant', backref=db.backref('opentable'))
+    reservations = db.relationship('Reservation', backref=db.backref('opentable'))
+
+
+class Reservation(db.Model):
+    """Table containing available reservation times"""
+
+    __tablename__ = "reservations"
+
+    reservation_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    opentable_id = db.Column(db.Integer, db.ForeignKey('opentable.opentable_id'), nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    people = db.Column(db.DateTime, nullable=False)
+    time = db.Column(db.Text, nullable=True)
+
+    #return details on object in terminal
+    def __repr__(self):
+        return "<Restaurant opentable=%i date=%s>" % (self.opentable_id, self.date)
 
 
 ##############################################################################
