@@ -1,6 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>This is my homepage</h1>
+<div class="container">
+  <h2>Upcoming Reservations</h2>
+  <p>Upcoming brunch reservations in San Francisco for popular restaurants</p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>People</th>
+        <th>Time</th>        
+      </tr>
+    </thead>
+    <tbody>
+      {% for reservation in reservations %}  
+      <tr>
+        <td>{{ reservation.date.strftime('%b %d, %A') }}</td>
+        <td><a href ='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%2012:00:00%20PM&p={{ reservation.people }}'>{{ reservation.opentable.name }}</a></td>
+        <td>{{ reservation.people }}</td>
+        <td>{{ reservation.time }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 {% endblock %}

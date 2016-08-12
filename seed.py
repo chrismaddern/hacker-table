@@ -15,7 +15,7 @@ def load_opentable():
     Opentable.query.delete()
 
     #Read the source file and insert data, use 'rU' so \r is read as line break
-    for line in open('data/opentable.txt','rU'):
+    for line in open('seed/opentable.txt','rU'):
         line = line.rstrip()
         opentable_id, reserve_url, price, address, phone, lat, lng, image_url, name = line.split('|')
 
@@ -45,7 +45,7 @@ def load_restaurants():
     Restaurant.query.delete()
 
     #Read the source file and insert data, use 'rU' so \r is read as line break
-    for line in open('data/restaurants.txt','rU'):
+    for line in open('seed/restaurants.txt','rU'):
         line = line.rstrip()
         name, opentable_id, eater, yelp, timeout, zagat, michelin, infatuation = line.split('|')
         if opentable_id == 'None':

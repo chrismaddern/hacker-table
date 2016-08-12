@@ -6,7 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask import (Flask, render_template, redirect, request, flash,
                    session)
 
-from model import Restaurant, Opentable, connect_to_db, db
+from model import Restaurant, Opentable, Reservation, connect_to_db, db
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -23,9 +23,11 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
-    return render_template("homepage.html")
+    #query all existing reservations that are not null
+    reservations = Reservation.query.filter(Reservation.time != None).order_by('date', 'people').all()
 
-
+    # return 'Hello world'
+    return render_template("homepage.html", reservations=reservations)
 
 
 if __name__ == "__main__":
@@ -38,4 +40,4 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    app.run()
+    app.run(host= '0.0.0.0')

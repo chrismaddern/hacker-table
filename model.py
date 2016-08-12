@@ -59,10 +59,10 @@ class Reservation(db.Model):
 
     __tablename__ = "reservations"
 
-    reservation_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    reservation_id = db.Column(db.Integer, primary_key=True)
     opentable_id = db.Column(db.Integer, db.ForeignKey('opentable.opentable_id'), nullable=True)
     date = db.Column(db.DateTime, nullable=False)
-    people = db.Column(db.DateTime, nullable=False)
+    people = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Text, nullable=True)
 
     #return details on object in terminal
@@ -87,4 +87,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
+    # db.create_all()  # create all tables
     print "Connected to DB."
