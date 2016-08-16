@@ -3,10 +3,11 @@ import arrow
 from bs4 import BeautifulSoup
 from model import Opentable, Reservation, connect_to_db, db
 from server import app
+import json
 
 
 # resto_list = [1906]
-person_list = [4,6] #limit search options to 4 and 6 people
+person_list = [4, 6]  # limit search options to 4 and 6 people
 
 
 def restaurant_query():
@@ -78,6 +79,10 @@ def scrape_opentable(date_list, resto_list, person_list):
                 with open('data/%s' % (filename), 'wb') as output:
                     output.write(opentable_file.read())
 
+    #save list_of_filenames as text file
+    with open('data/list_of_filenames.txt', 'wb') as output:
+        output.write(str(list_of_filenames))
+
     #generates list of filenames for Beautiful Soup scraping
     return list_of_filenames
 
@@ -122,16 +127,24 @@ def reservation_times(list_of_filenames):
 
         reservation_id = reservation_id + 1
 
+    #write reservation data to json file
+    reservation_json = json.dumps(reservation_dict)
+    with open('data/reservation_json.json', 'wb') as output:
+        output.write(reservation_json)
+
     return reservation_dict
 
 
-def load_reservations(reservation_dict):
+def load_reservations():
     """Load reservations data to database from scraped data"""
 
     print "Loading Reservation data"
 
     #Delete all rows in table to reseed data every time this function is called
     Reservation.query.delete()
+
+    #open json file and convert to dictionary for looping over
+    reservation_dict = json.load(open('data/reservation_json.json'))
 
     #loop over all items in dictionary to insert details to database
     for reservation_id, details in reservation_dict.items():
@@ -175,7 +188,7 @@ if __name__ == "__main__":
     print 'Scraping open table'
     list_of_filenames = scrape_opentable(date_list, resto_list, person_list)
     print 'Creating reservation dictionary'
-    reservation_dict = reservation_times(list_of_filenames)
+    reservation_times(list_of_filenames)
     print 'Seeding database'
-    load_reservations(reservation_dict)
+    load_reservations()
 

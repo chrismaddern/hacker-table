@@ -28,6 +28,9 @@ class Restaurant(db.Model):
     def __repr__(self):
         return "<Restaurant opentable=%i name=%s>" % (self.opentable_id, self.name)
 
+    # #define relationship between tables
+    yelp_details = db.relationship('Yelp_Detail', backref=db.backref('restaurants'))
+
 
 class Opentable(db.Model):
     """Table containing additional information from opentable"""
@@ -70,6 +73,31 @@ class Reservation(db.Model):
         return "<Restaurant opentable=%i date=%s>" % (self.opentable_id, self.date)
 
 
+class Yelp_Detail(db.Model):
+    """Table containing restaurant details from Yelp API"""
+
+    __tablename__ = "yelp_details"
+
+    resto_name = db.Column(db.String(100), db.ForeignKey('restaurants.name'), primary_key=True)
+    yelp_id = db.Column(db.String(100), nullable=False)
+    yelp_name = db.Column(db.String(100), nullable=False)
+    image_url = db.Column(db.String(100), nullable=False)
+    display_phone = db.Column(db.String(100), nullable=False)
+    review_count = db.Column(db.Integer, nullable=False)
+    categories = db.Column(db.String(200), nullable=False)
+    rating = db.Column(db.Float, nullable=False)
+    address = db.Column(db.String(100), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    neighborhoods = db.Column(db.String(100), nullable=False)
+    lat = db.Column(db.Float, nullable=False)
+    lng = db.Column(db.Float, nullable=False)
+    reservation_url = db.Column(db.String(100))
+
+    #return details on object in terminal
+    def __repr__(self):
+        return "<Restaurant name=%s>" % (self.resto_name)
+
+
 ##############################################################################
 # Helper functions
 
@@ -87,5 +115,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
-    # db.create_all()  # create all tables
+    db.create_all()  # create all tables
     print "Connected to DB."

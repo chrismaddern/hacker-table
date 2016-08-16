@@ -2,3 +2,5 @@ env/
 working_files/
 @rchive/
 data/
+secrets.sh
+*.pyc
