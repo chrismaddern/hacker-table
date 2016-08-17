@@ -23,15 +23,24 @@
         <td>{{ reservation.date.strftime('%b %d, %A') }}</td>
         <td><a href='/restaurant_details/{{ reservation.opentable.restaurants[0].restaurant_id }}'>{{ reservation.opentable.name }}</a></td>
         <td>{{ reservation.people }}</td>
-        <td><a href ='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%2012:00:00%20PM&p={{ reservation.people }}' target="_blank">
+        <td>
         <!-- clean up time string for looping over -->
         {% set timeline = reservation.time|replace('{','') %}
         {% set timeline = timeline|replace('}','') %}
         {% set timeline = timeline.split(',') %}
         {% for time in timeline %}
-        <button type="button" class="btn btn-primary btn-xs">{{ time }}</button>
+          <!-- make unique opentable URL depending on available time -->
+          {% if (time[0:2] == '9') or (time[0:2] == '10') or (time[0:2] == '11') %}
+          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20AM&p={{ reservation.people }}' target='_blank'
+          <button type="button" class="btn btn-primary btn-xs">{{ time }}</button></a>
+          {% elif (time[0:2] == '12') %}
+          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
+          <button type="button" class="btn btn-primary btn-xs">{{ time }}</button></a>
+          {% else %}
+          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%200{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
+          <button type="button" class="btn btn-primary btn-xs">{{ time }}</button></a>
+          {% endif %}        
         {% endfor %}
-        </a>
         </td>
       </tr>
       {% endfor %}

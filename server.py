@@ -1,7 +1,6 @@
 """ Hacker Table """
 
 import os
-import json
 
 from jinja2 import StrictUndefined
 
