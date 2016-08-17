@@ -26,7 +26,7 @@ class Restaurant(db.Model):
 
     #return details on object in terminal
     def __repr__(self):
-        return "<Restaurant opentable=%i name=%s>" % (self.opentable_id, self.name)
+        return "<Restaurant name=%s>" % (self.name)
 
     # #define relationship between tables
     yelp_details = db.relationship('Yelp_Detail', backref=db.backref('restaurants'))
@@ -49,7 +49,7 @@ class Opentable(db.Model):
 
     #return details on object in terminal
     def __repr__(self):
-        return "<Restaurant opentable=%i name=%s>" % (self.opentable_id, self.name)
+        return "<Restaurant name=%s>" % (self.name)
 
 
     #define relationship between tables
@@ -115,5 +115,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
-    db.create_all()  # create all tables
+    # db.create_all()  # create all tables
     print "Connected to DB."

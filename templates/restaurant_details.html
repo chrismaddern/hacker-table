@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Hacker Brunch - {{restaurant.name}}{% endblock %}
+{% block content %}
+
+<style type="text/css">
+  /*html, body { height: 100%; margin: 0; padding: 0; }*/
+  #map { height: 300px; width: 500px; }
+</style>
+
+<div class="container">
+<h3>{{ restaurant.name }}</h3>
+<img src='{{ restaurant.yelp_details[0].image_url }}' alt='{{ restaurant.name }}'><br>
+Address: {{ restaurant.yelp_details[0].address }}<br>
+Yelp Rating: {{ restaurant.yelp_details[0].rating }}<br>
+<a href='https://www.yelp.com/biz/{{ restaurant.yelp_details[0].yelp_id }}'>Link to Yelp Review Page</a><br>
+Phone: {{ restaurant.yelp_details[0].display_phone }}<br>
+Categories: {{ restaurant.yelp_details[0].categories }}<br>
+Neighborhoods: {{ restaurant.yelp_details[0].neighborhoods }}<br>
+Yelp Reservation URL: {{ restaurant.yelp_details[0].reservation_url }}<br><br>
+
+<div id="map"></div><br><br>
+
+<script>
+
+  function initMap() {
+
+    var map;
+
+    var myLatLng = {lat: {{ restaurant.yelp_details[0].lat }}, lng: {{ restaurant.yelp_details[0].lng }}};
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: myLatLng,
+      zoom: 15
+    });
+
+    // add a marker for the restaurant
+    var marker = new google.maps.Marker({
+      position: myLatLng,
+      map: map,
+      title: 'Hello World!'
+    });
+
+    marker.setMap(map);
+
+  }
+
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ gkey }}&callback=initMap"
+async defer></script>
+
+{% endblock %}

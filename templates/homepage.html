@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
+{% block title %}Hacker Brunch{% endblock %}
+
 {% block content %}
+
+
 
 <div class="container">
   <h2>Hacker Brunch</h2>
@@ -17,9 +21,18 @@
       {% for reservation in reservations %}  
       <tr>
         <td>{{ reservation.date.strftime('%b %d, %A') }}</td>
-        <td><a href ='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%2012:00:00%20PM&p={{ reservation.people }}' target="_blank">{{ reservation.opentable.name }}</a></td>
+        <td><a href='/restaurant_details/{{ reservation.opentable.restaurants[0].restaurant_id }}'>{{ reservation.opentable.name }}</a></td>
         <td>{{ reservation.people }}</td>
-        <td>{{ reservation.time }}</td>
+        <td><a href ='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%2012:00:00%20PM&p={{ reservation.people }}' target="_blank">
+        <!-- clean up time string for looping over -->
+        {% set timeline = reservation.time|replace('{','') %}
+        {% set timeline = timeline|replace('}','') %}
+        {% set timeline = timeline.split(',') %}
+        {% for time in timeline %}
+        <button type="button" class="btn btn-primary btn-xs">{{ time }}</button>
+        {% endfor %}
+        </a>
+        </td>
       </tr>
       {% endfor %}
     </tbody>

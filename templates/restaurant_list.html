@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Hacker Brunch - Restaurant List{% endblock %}
+{% block content %}
+
+<div class="container">
+  <h2>Hacker Brunch Restaurant List</h2>
+  <p>List of popular restaurants for brunch</p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Neighborhood</th>
+        <th>Available on Hacker Brunch</th>     
+      </tr>
+    </thead>
+    <tbody>
+      {% for restaurant in restaurants %}  
+      <tr>
+        <td><a href='/restaurant_details/{{ restaurant.restaurant_id }}'>{{ restaurant.name }}</a></td>
+        <td>{{ restaurant.yelp_details[0].neighborhoods }}</td>
+        {% if restaurant.opentable_id %}
+        <td>Yes</td>
+        {% else %}
+        <td>No</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+

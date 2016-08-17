@@ -113,6 +113,6 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    # load_opentable()
-    # load_restaurants()
+    load_opentable()
+    load_restaurants()
     load_yelp_details()
