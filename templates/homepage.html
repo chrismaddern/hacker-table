@@ -7,7 +7,7 @@
 
 <div class="container">
   <h2>Hacker Brunch</h2>
-  <p>Upcoming brunch reservations in San Francisco for popular restaurants. <br>Click on the name of the restaurant to make a reservation on opentable.</p>
+  <p>Upcoming brunch reservations in San Francisco for popular brunch spots. <br>Click on the time to make a reservation directly on Opentable.</p>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -32,13 +32,13 @@
           <!-- make unique opentable URL depending on available time -->
           {% if (time[0:2] == '9') or (time[0:2] == '10') or (time[0:2] == '11') %}
           <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20AM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }}</button></a>
+          <button type="button" class="btn btn-primary btn-xs">{{ time }} AM</button></a>
           {% elif (time[0:2] == '12') %}
           <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }}</button></a>
+          <button type="button" class="btn btn-primary btn-xs">{{ time }} PM</button></a>
           {% else %}
           <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%200{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }}</button></a>
+          <button type="button" class="btn btn-primary btn-xs">{{ time }} PM</button></a>
           {% endif %}        
         {% endfor %}
         </td>

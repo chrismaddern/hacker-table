@@ -6,7 +6,7 @@ from server import app
 import json
 
 
-# resto_list = [1906]
+# resto_list = [16609] # sample restaurant for testing scraper
 person_list = [2, 4, 6]  # limit search options to 4 and 6 people
 
 
@@ -75,13 +75,11 @@ def scrape_reservation_times(url):
         soup = BeautifulSoup(url_output, 'html.parser')  # create beautiful soup object
         available_times = soup.find_all('span', class_='t')  # get reservation times
 
-        for x in sorted(available_times):
-            if len(reservation_times) < 5:
-                x = x.text
-                x = x.rstrip(' PM')  # delete extra string from times
-                reservation_times.append(x)  # get text only from beautiful soup object
-            else:
-                break
+        for x in available_times:
+            x = x.text
+            x = x.rstrip(' PM')  # delete extra string from times
+            reservation_times.append(x)  # get text only from beautiful soup object
+
         #delete any blank or zero values
         reservation_times = filter(lambda a: a != u'\xa0', reservation_times)
 
@@ -156,10 +154,10 @@ def load_reservations():
 
 if __name__ == "__main__":
     # User can work with database directly when run in interactive mode
-
     from server import app
     connect_to_db(app)
     print "Connected to DB."
+
 
     resto_list = restaurant_query()
     print 'Creating date list'
