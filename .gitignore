@@ -5,3 +5,4 @@ data/
 logs/
 secrets.sh
 *.pyc
+crontab.txt

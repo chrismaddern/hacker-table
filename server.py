@@ -32,8 +32,10 @@ def index():
     #query all existing reservations that are not null
     reservations = Reservation.query.filter(Reservation.time != None).order_by('date', 'people').all()
 
+    dates = db.session.query(Reservation.date).group_by(Reservation.date).order_by(Reservation.date).all()
+
     # return homepage with reservations
-    return render_template("homepage.html", reservations=reservations)
+    return render_template("homepage.html", reservations=reservations, dates=dates)
 
 
 @app.route('/restaurant_list')

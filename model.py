@@ -38,13 +38,6 @@ class Opentable(db.Model):
     __tablename__ = "opentable"
 
     opentable_id = db.Column(db.Integer, unique=True, nullable=True, primary_key=True)
-    reserve_url = db.Column(db.String(100), nullable=True)
-    price = db.Column(db.Integer, nullable=True)
-    address = db.Column(db.String(100), nullable=True)
-    phone = db.Column(db.String(15), nullable=True)
-    lat = db.Column(db.Float, nullable=True)
-    lng = db.Column(db.Float, nullable=True)
-    image_url = db.Column(db.String(100), nullable=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
     #return details on object in terminal

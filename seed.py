@@ -15,18 +15,11 @@ def load_opentable():
     Opentable.query.delete()
 
     #Read the source file and insert data, use 'rU' so \r is read as line break
-    for line in open('seed/opentable.txt', 'rU'):
+    for line in open('seed/opentable.csv', 'rU'):
         line = line.rstrip()
-        opentable_id, reserve_url, price, address, phone, lat, lng, image_url, name = line.split('|')
+        opentable_id, name = line.split(',')
 
         opentable = Opentable(opentable_id=opentable_id,
-                              reserve_url=reserve_url,
-                              price=price,
-                              address=address,
-                              phone=phone,
-                              lat=lat,
-                              lng=lng,
-                              image_url=image_url,
                               name=name)
 
         #add opentable info to the database
@@ -113,6 +106,6 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    load_opentable()
-    load_restaurants()
+    # load_opentable()
+    # load_restaurants()
     load_yelp_details()
