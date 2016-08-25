@@ -137,6 +137,8 @@ def load_reservations():
         people = int(details[2])
         if len(details[3]) == 0:
             time = None  # if no reservations, assign Nonetype
+        elif len(details[3]) >= 4:
+            time = details[3][1:4]  # if many reservations available, get 3 only
         else:
             time = details[3]
 
@@ -162,7 +164,6 @@ if __name__ == "__main__":
     from server import app
     connect_to_db(app)
     print "Connected to DB."
-
 
     resto_list = restaurant_query()
     print 'Creating date list'

@@ -23,13 +23,15 @@ class Restaurant(db.Model):
     zagat = db.Column(db.Boolean, nullable=False)
     michelin = db.Column(db.Boolean, nullable=False)
     infatuation = db.Column(db.Boolean, nullable=False)
+    lat = db.Column(db.Float)
+    lng = db.Column(db.Float)
 
     #return details on object in terminal
     def __repr__(self):
         return "<Restaurant name=%s>" % (self.name)
 
-    # #define relationship between tables
-    yelp_details = db.relationship('Yelp_Detail', backref=db.backref('restaurants'))
+    #define relationship between tables
+    yelp_details = db.relationship('Yelp_Detail', backref=db.backref('restaurants')) 
 
 
 class Opentable(db.Model):

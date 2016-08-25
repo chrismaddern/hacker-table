@@ -1,9 +1,9 @@
-html, body { 
-    height: 100%; 
-    margin: 0; 
-    padding: 0; 
+html, body {
+height: 100%;
+margin: 0;
+padding: 0;
 }
 
-#map-canvas { 
-    height: 100%; 
+#detail-map {
+height: 300px;
 }

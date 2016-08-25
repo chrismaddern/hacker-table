@@ -40,7 +40,7 @@ def load_restaurants():
     #Read the source file and insert data, use 'rU' so \r is read as line break
     for line in open('seed/restaurants.csv', 'rU'):
         line = line.rstrip()
-        name, opentable_id, eater, yelp, timeout, zagat, michelin, infatuation = line.split(',')
+        name, opentable_id, eater, yelp, timeout, zagat, michelin, infatuation, lat, lng = line.split(',')
         if opentable_id == 'None':
             opentable_id = None
 
@@ -52,7 +52,9 @@ def load_restaurants():
                                 timeout=timeout,
                                 zagat=zagat,
                                 michelin=michelin,
-                                infatuation=infatuation)
+                                infatuation=infatuation,
+                                lat=lat,
+                                lng=lng)
 
         #add restaurant to the database
         db.session.add(restaurant)
@@ -106,6 +108,6 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    # load_opentable()
-    # load_restaurants()
+    load_opentable()
+    load_restaurants()
     load_yelp_details()

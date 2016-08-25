@@ -1,6 +1,7 @@
 """ Hacker Table """
 
 import os
+import json
 
 from jinja2 import StrictUndefined
 
@@ -32,10 +33,11 @@ def index():
     #query all existing reservations that are not null
     reservations = Reservation.query.filter(Reservation.time != None).order_by('date', 'people').all()
 
+    #query unique dates in reservation database
     dates = db.session.query(Reservation.date).group_by(Reservation.date).order_by(Reservation.date).all()
 
     # return homepage with reservations
-    return render_template("homepage.html", reservations=reservations, dates=dates)
+    return render_template("homepage.html", reservations=reservations, dates=dates, gkey=gkey)
 
 
 @app.route('/restaurant_list')
@@ -58,6 +60,24 @@ def restaurant_details(restaurant_id):
 
     # return detailed restaurant page
     return render_template("restaurant_details.html", restaurant=restaurant, gkey=gkey)
+
+
+@app.route('/resto_markers', methods=['POST'])
+def resto_markers():
+    """Provide restaurant details for homepage map in JSON format"""
+
+    people = int(request.form.get("people"))
+
+    resto_markers = db.session.query(Reservation, Opentable, Restaurant).filter(Reservation.time != None, Reservation.people == people).join(Opentable).join(Restaurant).all()
+    resto_dict = {}
+    counter = 1
+    for resto in resto_markers:
+        resto_dict[counter] = {'name': resto[2].name, 'lat': resto[2].lat, 'lng': resto[2].lng}
+        counter += 1
+
+    resto_json = json.dumps(resto_dict)
+
+    return resto_json
 
 
 if __name__ == "__main__":

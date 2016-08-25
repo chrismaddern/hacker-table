@@ -3,26 +3,25 @@
 
 {% block content %}
 
-
-
 <div class="container">
-  <h2>Hacker Brunch</h2>
   <p>Upcoming brunch reservations in San Francisco for popular brunch spots. <br>Click on the time to make a reservation directly on Opentable.</p>
+  <div class="row">
   <table class="table table-striped myTable">
     <thead>
       <tr>
-        <th><button type="button" class="btn btn-primary btn-xs glyphicon glyphicon-filter align-right"></button>  Date</th>
+        <th><button type="button" class="btn btn-default btn-xs glyphicon glyphicon-filter align-right"></button>  Date</th>
         <th>Name</th>
         <th>People</th>
         <th>Available Reservation Time/s</th><!-- filter to toggle fields -->
       </tr>
+
       <tr class="search-fields" display="none">
         <!-- Filters for selecting from table -->
         <th>
           <select id="myDate" class="form-control" onchange="myFilter()">
             <option></option>
             {% for date in dates %}
-            <option>{{ date[0].strftime('%b %d') }}</option>
+            <option>{{ date[0].strftime('%b %-d, %a') }}</option>
             {% endfor %}
           </select>
         </th>
@@ -40,14 +39,13 @@
           </select>
         </th>
 
-        <th></th>
+        <th></tr>
 
-      </tr>
     </thead>
     <tbody>
       {% for reservation in reservations %}
       <tr class='reservation-entry'>
-        <td>{{ reservation.date.strftime('%b %d, %A') }}</td>
+        <td>{{ reservation.date.strftime('%b %-d, %a') }}</td>
         <td><a href='/restaurant_details/{{ reservation.opentable.restaurants[0].restaurant_id }}'>{{ reservation.opentable.name }}</a></td>
         <td>{{ reservation.people }}</td>
         <td>
@@ -76,13 +74,20 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
+</div>
+
+<div class="container" style="height: 80%">
+  <button id='populate_map' type="button" class="btn btn-primary btn-xs">POPULATE MAP</button>
+  <button id='reset_map' type="button" class="btn btn-primary btn-xs">RESET MAP</button>
+  <div id="homepage-map" style="height: 80%"></div>
 </div>
 
 <script type="text/javascript">
 
 'use strict';
 
-function myTest(){
+function myFilter(){
   var input1, input2, input3, tr, td1, td2, td3, i;
   input1 = $("#myDate").val();
   input2 = $("#myResto").val().toUpperCase();
@@ -102,14 +107,86 @@ function myTest(){
   }
 }
 
-
 $(document).ready(function(){
     $(".glyphicon-filter").click(function(){
         $(".search-fields").toggle();
     });
 });
 
+
+$("#reset" ).click(function() {
+  $("#myDate").val("");
+  $("#myResto").val("");
+  $("#myNum").val("");
+  var tr = $(".reservation-entry");
+  for (i = 0; i < tr.length; i++) {
+    tr[i].style.display = "";
+  }
+});
+
+
+var map;
+var sanFrancisco = {lat: 37.7749, lng: -122.431297}; 
+var markersArray = [];
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById('homepage-map'), {
+    center: sanFrancisco,
+    zoom: 13
+  });
+}
+
+function addMarker(lat, lng, content, map) {
+    var marker = new google.maps.Marker({
+      position: {lat: lat, lng: lng},
+      map: map
+    });
+
+    var infowindow = new google.maps.InfoWindow({
+      content: content
+    });
+
+    markersArray.push(marker);
+
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+}
+
+function clearOverlays() {
+  for (var i = 0; i < markersArray.length; i++ ) {
+    markersArray[i].setMap(null);
+  }
+  markersArray.length = 0;
+}
+
+
+var marker_details
+
+function createMarkers(results) {
+  marker_details = JSON.parse(results);
+  for (var i = 1; i < Object.keys(marker_details).length; i++) { 
+      addMarker(marker_details[i].lat, marker_details[i].lng, marker_details[i].name, map);
+    }
+}
+
+function getRestoMarkers() {
+  var queryInputs = {
+    "people": $("#myNum").val()
+  };
+  $.post('/resto_markers', queryInputs, createMarkers);
+  console.log(queryInputs);
+  console.log('Finished sending AJAX');
+}
+
+$('#populate_map').click(getRestoMarkers);
+$('#reset_map').click(clearOverlays);
+
+
 </script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ gkey }}&callback=initMap"
+async defer></script>
 
 {% endblock %}
 
