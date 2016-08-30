@@ -93,6 +93,37 @@ class Yelp_Detail(db.Model):
         return "<Restaurant name=%s>" % (self.resto_name)
 
 
+class User(db.Model):
+    """Table containing User login information"""
+
+    __tablename__ = "users"
+
+    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_email = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+
+    #return details on object in terminal
+    def __repr__(self):
+        return "<Email Address=%s>" % (self.user_email)
+
+
+class User_Detail(db.Model):
+    """Table containing user feedback on restaurants"""
+
+    __tablename__ = "user_details"
+
+    user_detail_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    opentable_id = db.Column(db.Integer, db.ForeignKey('opentable.opentable_id'), nullable=False)
+    have_tried = db.Column(db.Boolean, nullable=True)
+    want_to_try = db.Column(db.Boolean, nullable=True)
+    like_resto = db.Column(db.Boolean, nullable=True)
+
+    #return details on object in terminal
+    def __repr__(self):
+        return "<User ID=%s>" % (self.user_id)
+
+
 ##############################################################################
 # Helper functions
 

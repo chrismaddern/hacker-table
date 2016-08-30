@@ -5,10 +5,14 @@
   <link rel="shortcut icon" href="">
   <title>{% block title %}{% endblock %}</title>
 
-  <!-- Including links to jquery and bootstrap in parent file -->
-  <script src ='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+  <!-- CSS from bootsrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link href="/static/style.css" rel="stylesheet">
+
+  <!-- JS files from google maps, bootstrap, datatables -->
+  <script src ='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 
 </head>
 
@@ -24,12 +28,22 @@
       </button>
       <a class="navbar-brand" href="/"><b>Hacker Brunch</b></a>
     </div>
+
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a href="/restaurant_list">Restaurant List</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        {% if session['user_email'] %}<li><a>{{ session['user_email'] }}</a></li>{% endif %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-cog"></span><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a data-toggle="modal" data-target="#createaccount">Create Account</a></li>
+            <li><a data-toggle="modal" data-target="#login">Log In</a></li>
+            <li><a href="/logout">Log Out</a></li>
+          </ul>
+        </li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -37,14 +51,87 @@
 
 <body>
 
+<!-- Create Account Modal -->
+<div class="modal fade" id="createaccount" role="dialog">
+  <div class="modal-dialog">
+    
+    <!-- Modal content-->
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Create a Hacker Brunch Account</h4>
+      </div>
+      
+      <div class="modal-body">
+
+        <form action='/create' method='POST'>        
+        <div class="form-group">
+          <label for="usr">Username:</label>
+          <input type="text" class="form-control" id="usr" name='user_email'>
+        </div>        
+        <div class="form-group">
+          <label for="pwd">Password:</label>
+          <input type="password" class="form-control" id="pwd" name='password'>
+        </div>        
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-info" value="Create an Account">
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="login" role="dialog">
+  <div class="modal-dialog">
+    
+    <!-- Modal content-->
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Hacker Brunch Log In</h4>
+      </div>
+      
+      <div class="modal-body">
+
+        <form action='/login' method='POST'>        
+        <div class="form-group">
+          <label for="usr">Username:</label>
+          <input type="text" class="form-control" id="usr" name='user_email'>
+        </div>        
+        <div class="form-group">
+          <label for="pwd">Password:</label>
+          <input type="password" class="form-control" id="pwd" name='password'>
+        </div>        
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-info" value="Log In">
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  
+  </div>
+</div>
+
+
+<b><div class="container">
 <!-- Show flashed messages -->
 {% with messages = get_flashed_messages() %}
    {% if messages %}
       {% for message in messages %}
-         {{ message }}
+         <blockquote class="bg-success">{{ message }}</blockquote>
       {% endfor %}
    {% endif %}
 {% endwith %}
+</div></b>
 
 <!-- Insert body text here -->
 {% block content %} put your content here {% endblock %}

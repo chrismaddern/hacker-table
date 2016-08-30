@@ -3,28 +3,29 @@
 {% block content %}
 
 <div class="container">
-  <h2>Hacker Brunch Restaurant List</h2>
-  <p>List of popular restaurants for brunch</p>
   <table class="table table-striped">
     <thead>
       <tr>
         <th>Name</th>
+        <th></th>
         <th>Neighborhood</th>
-        <th>Available on Hacker Brunch</th>     
+        <th>Cuisine</th>     
       </tr>
     </thead>
     <tbody>
+      
       {% for restaurant in restaurants %}  
       <tr>
         <td><a href='/restaurant_details/{{ restaurant.restaurant_id }}'>{{ restaurant.name }}</a></td>
+        <td>{% if session %}
+            <button type="button" class="btn btn-outline-primary">Want to try</button>
+            {% endif %}
+        </td>
         <td>{{ restaurant.yelp_details[0].neighborhoods }}</td>
-        {% if restaurant.opentable_id %}
-        <td>Yes</td>
-        {% else %}
-        <td>No</td>
-        {% endif %}
+        <td>{{ restaurant.yelp_details[0].categories }}</td>
       </tr>
       {% endfor %}
+      
     </tbody>
   </table>
 </div>

@@ -1,6 +1,6 @@
 """Utility file to seed restaurants database in seed_data"""
 
-from model import Restaurant, Opentable, Yelp_Detail
+from model import Restaurant, Opentable, Yelp_Detail, User, User_Detail
 from model import connect_to_db, db
 from server import app
 import json
@@ -101,6 +101,65 @@ def load_yelp_details():
     #commit work
     db.session.commit()
 
+
+def load_users():
+    """Load sample users to database"""
+
+    print "Loading Users"
+
+    #Delete all rows in table to reseed data every time this function is called
+    User.query.delete()
+
+    #Read the source file and insert data, use 'rU' so \r is read as line break
+    for line in open('seed/users.csv', 'rU'):
+        line = line.rstrip()
+        user_email, password = line.split(',')
+
+        #create user object based on inputs from the line
+        user = User(user_email=user_email, password=password)
+
+        #add user to the database
+        db.session.add(user)
+
+    #commit work
+    db.session.commit()
+
+
+def load_user_details():
+    """Load sample user feedback to database"""
+
+    print "Loading User Details"
+
+    #Delete all rows in table to reseed data every time this function is called
+    User_Detail.query.delete()
+
+    #Read the source file and insert data, use 'rU' so \r is read as line break
+    for line in open('seed/user_details.csv', 'rU'):
+        line = line.rstrip()
+        user_id, opentable_id, have_tried, want_to_try, like_resto = line.split(',')
+
+        # Convert fields with 'None' to None-type
+        if have_tried == 'None':
+            have_tried = None
+        if want_to_try == 'None':
+            want_to_try = None
+        if like_resto == 'None':
+            like_resto = None
+
+        #create user object based on inputs from the line
+        user_details = User_Detail(user_id=user_id,
+                                   opentable_id=opentable_id,
+                                   have_tried=have_tried,
+                                   want_to_try=want_to_try,
+                                   like_resto=like_resto)
+
+        #add user to the database
+        db.session.add(user_details)
+
+    #commit work
+    db.session.commit()
+
+
 if __name__ == "__main__":
     connect_to_db(app)
 
@@ -111,3 +170,5 @@ if __name__ == "__main__":
     load_opentable()
     load_restaurants()
     load_yelp_details()
+    load_users()
+    load_user_details()

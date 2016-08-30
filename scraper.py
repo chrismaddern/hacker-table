@@ -165,6 +165,7 @@ if __name__ == "__main__":
     connect_to_db(app)
     print "Connected to DB."
 
+    print arrow.utcnow().to('US/Pacific')
     resto_list = restaurant_query()
     print 'Creating date list'
     date_list = current_time()
@@ -172,4 +173,5 @@ if __name__ == "__main__":
     scrape_opentable(date_list, resto_list, person_list)
     print 'Seeding database'
     load_reservations()
+    print arrow.utcnow().to('US/Pacific')
 

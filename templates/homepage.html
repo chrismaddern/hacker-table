@@ -4,7 +4,6 @@
 {% block content %}
 
 <div class="container">
-  <p>Upcoming brunch reservations in San Francisco for popular brunch spots. <br>Click on the time to make a reservation directly on Opentable.</p>
   <div class="row">
   <table class="table table-striped myTable">
     <thead>
@@ -12,7 +11,7 @@
         <th><button type="button" class="btn btn-default btn-xs glyphicon glyphicon-filter align-right"></button>  Date</th>
         <th>Name</th>
         <th>People</th>
-        <th>Available Reservation Time/s</th><!-- filter to toggle fields -->
+        <th>Available Reservation Times</th><!-- filter to toggle fields -->
       </tr>
 
       <tr class="search-fields" display="none">
@@ -87,6 +86,12 @@
 
 'use strict';
 
+// DataTable JS to paginate table
+// $(document).ready(function() {
+//     $('.myTable').DataTable();
+// } );
+
+// Show rows that meet filters
 function myFilter(){
   var input1, input2, input3, tr, td1, td2, td3, i;
   input1 = $("#myDate").val();
@@ -107,13 +112,14 @@ function myFilter(){
   }
 }
 
+// Toggle filter fields on and off
 $(document).ready(function(){
     $(".glyphicon-filter").click(function(){
         $(".search-fields").toggle();
     });
 });
 
-
+// Event listener to reset filter fields, currently not functioning
 $("#reset" ).click(function() {
   $("#myDate").val("");
   $("#myResto").val("");
@@ -124,11 +130,12 @@ $("#reset" ).click(function() {
   }
 });
 
-
+// Global variables for Google Maps
 var map;
 var sanFrancisco = {lat: 37.7749, lng: -122.431297}; 
 var markersArray = [];
 
+// Create map upon page load
 function initMap() {
   map = new google.maps.Map(document.getElementById('homepage-map'), {
     center: sanFrancisco,
@@ -136,6 +143,7 @@ function initMap() {
   });
 }
 
+// Add markers on map
 function addMarker(lat, lng, content, map) {
     var marker = new google.maps.Marker({
       position: {lat: lat, lng: lng},
@@ -146,13 +154,21 @@ function addMarker(lat, lng, content, map) {
       content: content
     });
 
+    // Add marker to Array to be used by clearOverlays
     markersArray.push(marker);
 
-    marker.addListener('click', function() {
-      infowindow.open(map, marker);
+    // Show infowinder on hover over
+    marker.addListener('mouseover', function() {
+    infowindow.open(map, this);
+    });
+
+    // Hide infowindow on mouse out
+    marker.addListener('mouseout', function() {
+        infowindow.close();
     });
 }
 
+// Clear all markers on map
 function clearOverlays() {
   for (var i = 0; i < markersArray.length; i++ ) {
     markersArray[i].setMap(null);
@@ -161,24 +177,27 @@ function clearOverlays() {
 }
 
 
-var marker_details
-
+// Create markers based on AJAX response
 function createMarkers(results) {
-  marker_details = JSON.parse(results);
-  for (var i = 1; i < Object.keys(marker_details).length; i++) { 
+  var marker_details = JSON.parse(results);
+  for (var i = 1; i < ((Object.keys(marker_details).length) + 1); i++) { 
       addMarker(marker_details[i].lat, marker_details[i].lng, marker_details[i].name, map);
     }
 }
 
+// Get JSON file of resto markers based on selected filters
 function getRestoMarkers() {
   var queryInputs = {
-    "people": $("#myNum").val()
+    "date": $("#myDate").val(),
+    "resto": $("#myResto").val(),
+    "people": $("#myNum").val(),
   };
   $.post('/resto_markers', queryInputs, createMarkers);
   console.log(queryInputs);
   console.log('Finished sending AJAX');
 }
 
+// Event listeners for buttons above map
 $('#populate_map').click(getRestoMarkers);
 $('#reset_map').click(clearOverlays);
 
