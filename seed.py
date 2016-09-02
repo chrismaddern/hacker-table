@@ -113,10 +113,12 @@ def load_users():
     #Read the source file and insert data, use 'rU' so \r is read as line break
     for line in open('seed/users.csv', 'rU'):
         line = line.rstrip()
-        user_email, password = line.split(',')
+        user_email, user_phone, password = line.split(',')
+        if user_email == 'None':
+            user_email = None
 
         #create user object based on inputs from the line
-        user = User(user_email=user_email, password=password)
+        user = User(user_email=user_email, user_phone=user_phone, password=password)
 
         #add user to the database
         db.session.add(user)
@@ -166,9 +168,8 @@ if __name__ == "__main__":
     # In case tables haven't been created, create them
     db.create_all()
 
-    # Import different types of data
+    # Import data for various tables
     load_opentable()
     load_restaurants()
     load_yelp_details()
     load_users()
-    load_user_details()

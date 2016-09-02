@@ -3,79 +3,137 @@
 
 {% block content %}
 
+
 <div class="container">
-  <div class="row">
-  <table class="table table-striped myTable">
+
+<!-- Filters for table -->
+<div class='row'>
+  <table id='filter-table' class="table">
     <thead>
       <tr>
-        <th><button type="button" class="btn btn-default btn-xs glyphicon glyphicon-filter align-right"></button>  Date</th>
-        <th>Name</th>
-        <th>People</th>
-        <th>Available Reservation Times</th><!-- filter to toggle fields -->
+        <th><button id='filter-button' type="button" class="btn btn-default"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></button></th>
+        <th></th>
       </tr>
-
-      <tr class="search-fields" display="none">
-        <!-- Filters for selecting from table -->
-        <th>
+    </thead>
+    <tbody>
+      <tr id='filter-row' style='display:none;'>
+        <td>Filter by Date
           <select id="myDate" class="form-control" onchange="myFilter()">
             <option></option>
             {% for date in dates %}
             <option>{{ date[0].strftime('%b %-d, %a') }}</option>
             {% endfor %}
           </select>
-        </th>
-
-        <th>
-            <input id="myResto" type="text" class="form-control" onkeyup="myFilter()">
-        </th>
-        
-        <th>
-          <select id="myNum" onchange="myFilter()" class="form-control">
-            <option></option>
-            <option>2</option>
-            <option>4</option>
-            <option>6</option>
-          </select>
-        </th>
-
-        <th></tr>
-
-    </thead>
-    <tbody>
-      {% for reservation in reservations %}
-      <tr class='reservation-entry'>
-        <td>{{ reservation.date.strftime('%b %-d, %a') }}</td>
-        <td><a href='/restaurant_details/{{ reservation.opentable.restaurants[0].restaurant_id }}'>{{ reservation.opentable.name }}</a></td>
-        <td>{{ reservation.people }}</td>
-        <td>
-        <!-- clean up time string for looping over -->
-        {% set timeline = reservation.time|replace('{','') %}
-        {% set timeline = timeline|replace('}','') %}
-        {% set timeline = timeline.split(',') %}
-        {% for time in timeline %}
-          <!-- make unique opentable URL depending on available time -->
-          {% if (time[0:1] == '9') %}
-          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%200{{ time }}:00%20AM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }} AM</button></a>
-          {% elif (time[0:2] == '10') or (time[0:2] == '11') %}
-          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20AM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }} AM</button></a>
-          {% elif (time[0:2] == '12') %}
-          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }} PM</button></a>
-          {% else %}
-          <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%200{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
-          <button type="button" class="btn btn-primary btn-xs">{{ time }} PM</button></a>
-          {% endif %}
-        {% endfor %}
         </td>
+        <td>Filter by Name<input id="myResto" type="text" class="form-control" onkeyup="myFilter()"></td>
       </tr>
-      {% endfor %}
     </tbody>
-  </table>
+  </table><br>
+</div>
+
+<!-- Row for tabs and table -->
+<div class='row'>
+  <ul class="nav nav-tabs">
+    <li class="active" id='myNum' onclick="clearNumVar(); myFilter();"><a href="#home">All Tables</a></li>
+    <li id='myNum' onclick="setNumVar(2); myFilter();"><a href="#tablesfor2">Tables for 2</a></li>
+    <li id='myNum' onclick="setNumVar(4); myFilter();"><a href="#tablesfor4">Tables for 4</a></li>
+    <li id='myNum' onclick="setNumVar(6); myFilter();"><a href="#tablesfor6">Tables for 6</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="home" class="tab-pane fade in active"></div>
+    <div id="myNum" class="tab-pane fade"></div>
+  </div>
+
+<!-- Table with reservation data -->
+<table class="table table-striped myTable">
+<thead>
+  <tr>
+    <th>Date</th>
+    <th>Name</th>
+    <th>People</th>
+    <th>Available Reservation Times</th>
+</thead>
+
+<tbody>
+  {% for reservation in reservations %}
+  <tr class='reservation-entry'>
+    <td>{{ reservation.date.strftime('%b %-d, %a') }}</td>
+    <td><a href='/restaurant_details/{{ reservation.opentable.restaurants[0].restaurant_id }}'>{{ reservation.opentable.name }}</a></td>
+    <td>{{ reservation.people }}</td>
+    <td>
+    <!-- clean up time string for looping over -->
+    {% set timeline = reservation.time|replace('{','') %}
+    {% set timeline = timeline|replace('}','') %}
+    {% set timeline = timeline.split(',') %}
+    {% for time in timeline %}
+      <!-- make unique opentable URL depending on available time -->
+      {% if (time == 'None') %}
+      <a data-toggle="modal" data-target="#notify" id='{{ reservation.people }} {{ reservation.opentable_id }} {{ reservation.date.strftime('%b%d') }} {{reservation.opentable.name}} '>
+      <button type="button" class="btn btn-default btn-xs">Notify Me</button></a>
+      {% elif (time[0:1] == '9') %}
+      <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%200{{ time }}:00%20AM&p={{ reservation.people }}' target='_blank'
+      <button type="button" class="btn btn-primary btn-xs">{{ time }} AM</button></a>
+      {% elif (time[0:2] == '10') or (time[0:2] == '11') %}
+      <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20AM&p={{ reservation.people }}' target='_blank'
+      <button type="button" class="btn btn-primary btn-xs">{{ time }} AM</button></a>
+      {% elif (time[0:2] == '12') %}
+      <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%20{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
+      <button type="button" class="btn btn-primary btn-xs">{{ time }} PM</button></a>
+      {% else %}
+      <a href='http://opentable.com/opentables.aspx?t=rest&r={{ reservation.opentable_id }}&d={{ reservation.date.strftime('%m/%d/%Y') }}%200{{ time }}:00%20PM&p={{ reservation.people }}' target='_blank'
+      <button type="button" class="btn btn-primary btn-xs">{{ time }} PM</button></a>
+      {% endif %}
+    {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+</table>
+</div>
+</div>
+
+<!-- Notify Me  Modal -->
+<div class="modal fade" id="notify" role="dialog">
+  <div class="modal-dialog">
+    
+    <!-- Modal content-->
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Create a Notification</h4>
+      </div>
+      
+      <div class="modal-body">
+
+        <form action='/notify' method='POST'>        
+        <div class="form-group">
+        <!-- Hidden fields to be submitted with form -->
+        <input type="hidden" name="opentable" id="form-opentable">
+        <input type="hidden" name="date" id="form-date">
+        <input type="hidden" name="people" id="form-people">
+
+        <label>Restaurant Name:</label> <span class="data-restaurant"></span><br>
+        <label>Date:</label> <span class="data-date"></span><br>     
+        <label>Number of People:</label> <span class="data-people"></span><br><br>
+          <label for="usr">Your Mobile Number:</label>
+          <input type="text" class="form-control" id="usr" name='user_mobile'>
+        </div>             
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-info" value="Create a Notification">
+        </form>
+        </div>
+
+      </div>
+
+    </div>
+  
   </div>
 </div>
 
+<!-- Google Map -->
 <div class="container" style="height: 80%">
   <button id='populate_map' type="button" class="btn btn-primary btn-xs">POPULATE MAP</button>
   <button id='reset_map' type="button" class="btn btn-primary btn-xs">RESET MAP</button>
@@ -86,17 +144,52 @@
 
 'use strict';
 
-// DataTable JS to paginate table
-// $(document).ready(function() {
-//     $('.myTable').DataTable();
-// } );
+// event listener to pass values to modal
+$('#notify').on('show.bs.modal', function(evt) {
+    var $modal = $(this), data = evt.relatedTarget.id;
+    var data_array = data.split(" "); 
+    var people = data_array.shift();
+    var opentable = data_array.shift();
+    var date = data_array.shift();
+    var restaurant = data_array.join(" ");
+    // pass values to modal for display
+    $modal.find('.data-restaurant').html(restaurant);
+    $modal.find('.data-date').html(date);
+    $modal.find('.data-people').html(people);
+    // pass values to hidden fields for form submission
+    $('#form-opentable').val(opentable);
+    $('#form-date').val(date);
+    $('#form-people').val(people);
+});
+
+// Listener for tabs
+$(document).ready(function(){
+    $(".nav-tabs a").click(function(){
+        $(this).tab('show');
+    });
+});
+
+// Set myNum based on clicked tab
+var myNum = ""
+function clearNumVar(){
+	myNum = "";
+	console.log(myNum);
+}
+function setNumVar(num){
+	myNum = num;
+	console.log(myNum);
+}
+
+$('#filter-button').click(function() {
+	$('#filter-row').toggle();
+});
 
 // Show rows that meet filters
 function myFilter(){
   var input1, input2, input3, tr, td1, td2, td3, i;
   input1 = $("#myDate").val();
   input2 = $("#myResto").val().toUpperCase();
-  input3 = $("#myNum").val();
+  input3 = myNum;
   tr = $(".reservation-entry");
   for (i = 0; i < tr.length; i++) {
     td1 = tr[i].getElementsByTagName("td")[0];
@@ -112,23 +205,6 @@ function myFilter(){
   }
 }
 
-// Toggle filter fields on and off
-$(document).ready(function(){
-    $(".glyphicon-filter").click(function(){
-        $(".search-fields").toggle();
-    });
-});
-
-// Event listener to reset filter fields, currently not functioning
-$("#reset" ).click(function() {
-  $("#myDate").val("");
-  $("#myResto").val("");
-  $("#myNum").val("");
-  var tr = $(".reservation-entry");
-  for (i = 0; i < tr.length; i++) {
-    tr[i].style.display = "";
-  }
-});
 
 // Global variables for Google Maps
 var map;
@@ -185,12 +261,19 @@ function createMarkers(results) {
     }
 }
 
+// Center map to SF
+function centerMap(){
+    var center = new google.maps.LatLng(37.7749, -122.431297);
+    map.panTo(center);
+    map.setZoom(12);
+}
+
 // Get JSON file of resto markers based on selected filters
 function getRestoMarkers() {
   var queryInputs = {
     "date": $("#myDate").val(),
     "resto": $("#myResto").val(),
-    "people": $("#myNum").val(),
+    "people": myNum,
   };
   $.post('/resto_markers', queryInputs, createMarkers);
   console.log(queryInputs);
@@ -200,6 +283,7 @@ function getRestoMarkers() {
 // Event listeners for buttons above map
 $('#populate_map').click(getRestoMarkers);
 $('#reset_map').click(clearOverlays);
+$('#reset_map').click(centerMap);
 
 
 </script>

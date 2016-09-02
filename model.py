@@ -50,7 +50,7 @@ class Opentable(db.Model):
     #define relationship between tables
     restaurants = db.relationship('Restaurant', backref=db.backref('opentable'))
     reservations = db.relationship('Reservation', backref=db.backref('opentable'))
-
+    notifications = db.relationship('Notification', backref=db.backref('opentable')) 
 
 class Reservation(db.Model):
     """Table containing available reservation times"""
@@ -100,11 +100,16 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_email = db.Column(db.String(50), nullable=False)
+    user_phone = db.Column(db.String(10), nullable=True)
     password = db.Column(db.String(50), nullable=False)
 
     #return details on object in terminal
     def __repr__(self):
         return "<Email Address=%s>" % (self.user_email)
+
+    #define relationship between tables
+    notifications = db.relationship('Notification', backref=db.backref('user'))
+    user_details = db.relationship('User_Detail', backref=db.backref('user'))
 
 
 class User_Detail(db.Model):
@@ -114,15 +119,28 @@ class User_Detail(db.Model):
 
     user_detail_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    opentable_id = db.Column(db.Integer, db.ForeignKey('opentable.opentable_id'), nullable=False)
-    have_tried = db.Column(db.Boolean, nullable=True)
-    want_to_try = db.Column(db.Boolean, nullable=True)
-    like_resto = db.Column(db.Boolean, nullable=True)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.restaurant_id'), nullable=False)
+    status = db.Column(db.String(10), nullable=True)
 
     #return details on object in terminal
     def __repr__(self):
         return "<User ID=%s>" % (self.user_id)
 
+
+class Notification(db.Model):
+    """Table containing notifications for reservations"""
+
+    __tablename__ = "notifications"
+
+    notification_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    opentable_id = db.Column(db.Integer, db.ForeignKey('opentable.opentable_id'), nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    people = db.Column(db.Integer, nullable=False)
+
+    #return details on object in terminal
+    def __repr__(self):
+        return "<Notification ID=%s>" % (self.notification_id)
 
 ##############################################################################
 # Helper functions

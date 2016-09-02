@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Hacker Brunch - User Notifications{% endblock %}
+{% block content %}
+
+<div class="container">
+
+  <table class="table">
+    <h3>Your existing notifications</h3>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Restaurant</th>
+        <th>People</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      {% for notification in notifications %}  
+      <tr>
+        <td>{{ notification.date.strftime('%b %-d, %a') }}</td>
+        <td>{{ notification.opentable.name }}</td>
+        <td>{{ notification.people }}</td>
+        <form action='/cancel' method='POST'>  
+        <input type="hidden" name="opentable" value="{{ notification.opentable.opentable_id }}">
+        <input type="hidden" name="date" value="{{ notification.date }}">
+        <input type="hidden" name="people" value="{{ notification.people }}">
+        <td><input type="submit" class="btn btn-warning btn-xs" value="Cancel Notification"></td>
+        </form>
+      </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
