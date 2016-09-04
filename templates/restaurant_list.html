@@ -88,7 +88,8 @@ function updateStatus(evt) {
   $.post('/update_status', formInputs, updateSuccess);
 }
 
-// On page load, populate buttons with user preferences
+// On page load, populate buttons with user preferences; only run if user is logged in
+{% if session['user_email'] %} 
 function populateButtons(){
   {% for detail in user_details %}
     var id = Number('{{ detail.restaurant_id}}');
@@ -113,6 +114,7 @@ function populateButtons(){
     console.log(id);
   {% endfor %}
 }
+{% endif %}
 
 // event listeners for button clicks and page load
 $('.try-button').click(updateStatus);

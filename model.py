@@ -31,7 +31,14 @@ class Restaurant(db.Model):
         return "<Restaurant name=%s>" % (self.name)
 
     #define relationship between tables
-    yelp_details = db.relationship('Yelp_Detail', backref=db.backref('restaurants')) 
+    yelp_details = db.relationship('Yelp_Detail', backref=db.backref('restaurants'))
+
+    @classmethod
+    def get_all_restaurants(cls):
+        """Get all restaurants in database"""
+
+        restaurants = Restaurant.query.order_by('name').all()
+        return restaurants
 
 
 class Opentable(db.Model):
@@ -50,7 +57,8 @@ class Opentable(db.Model):
     #define relationship between tables
     restaurants = db.relationship('Restaurant', backref=db.backref('opentable'))
     reservations = db.relationship('Reservation', backref=db.backref('opentable'))
-    notifications = db.relationship('Notification', backref=db.backref('opentable')) 
+    notifications = db.relationship('Notification', backref=db.backref('opentable'))
+
 
 class Reservation(db.Model):
     """Table containing available reservation times"""
@@ -66,6 +74,20 @@ class Reservation(db.Model):
     #return details on object in terminal
     def __repr__(self):
         return "<Restaurant opentable=%i date=%s>" % (self.opentable_id, self.date)
+
+    @classmethod
+    def get_all_reservations(cls):
+        """Get all reservations in database"""
+
+        reservations = Reservation.query.order_by('date', 'people').all()
+        return reservations
+
+    @classmethod
+    def get_all_dates(cls):
+        """Get all dates in database"""
+
+        dates = db.session.query(Reservation.date).group_by(Reservation.date).order_by(Reservation.date).all()
+        return dates
 
 
 class Yelp_Detail(db.Model):
@@ -111,6 +133,28 @@ class User(db.Model):
     notifications = db.relationship('Notification', backref=db.backref('user'))
     user_details = db.relationship('User_Detail', backref=db.backref('user'))
 
+    @classmethod
+    def get_user_id(cls, user_email):
+        """Get user_id based on session login details"""
+
+        user_id = db.session.query(User).filter_by(user_email=user_email).one().user_id
+        return user_id
+
+    @classmethod
+    def search_user(cls, user_email, password):
+        """See if user exists in database"""
+
+        user = User.query.filter_by(user_email=user_email).first()
+        return user
+
+
+    @classmethod
+    def udate_mobile(cls, user_email, user_mobile):
+        """Update user_mobile in database"""
+
+        db.session.query(User).filter_by(user_email=user_email).update({'user_phone': user_mobile})
+        db.session.commit()
+
 
 class User_Detail(db.Model):
     """Table containing user feedback on restaurants"""
@@ -125,6 +169,19 @@ class User_Detail(db.Model):
     #return details on object in terminal
     def __repr__(self):
         return "<User ID=%s>" % (self.user_id)
+
+    @classmethod
+    def get_user_details(cls, user_id):
+        """Get user details based on session login details"""
+
+        user_details = db.session.query(User_Detail).filter(User_Detail.user_id==user_id, User_Detail.status!=None).all()
+        return user_details
+
+    @classmethod
+    def search_user_detail(cls, user_id, restaurant_id):
+        """See if database entry exists for specified criteria"""
+        user_detail = db.session.query(User_Detail).filter(User_Detail.user_id == user_id, User_Detail.restaurant_id == restaurant_id).first()
+        return user_detail
 
 
 class Notification(db.Model):
@@ -141,6 +198,44 @@ class Notification(db.Model):
     #return details on object in terminal
     def __repr__(self):
         return "<Notification ID=%s>" % (self.notification_id)
+
+    @classmethod
+    def get_user_notifications(cls, user_id):
+        """Get notifications based on session login details"""
+
+        notifications = db.session.query(Notification).filter_by(user_id=user_id).all()
+        return notifications
+
+    @classmethod
+    def add_notification(cls, user_id, opentable_id, date, people):
+        """See if notification exists in database"""
+
+        notification = db.session.query(Notification).filter(Notification.user_id == user_id, Notification.opentable_id == opentable_id, Notification.date == date, Notification.people == people).first()
+
+        if notification is not None:
+            return 'You already have an existing notification set up.'
+        else:
+            new_notification = Notification(user_id=user_id, opentable_id=opentable_id, date=date, people=people)
+            db.session.add(new_notification)
+            db.session.commit()
+            return 'You have successfully created a notification.'
+
+    @classmethod
+    def delete_notification(cls, user_id, opentable_id, date, people):
+        """See if notification exists in database"""
+
+        db.session.query(Notification).filter(Notification.user_id == user_id, Notification.opentable_id == opentable_id, Notification.date == date, Notification.people == people).delete()
+        db.session.commit()
+        return 'You have deleted a notification'
+
+
+def example_data():
+    user = User(user_email='test@gmail.com', user_phone=123456, password='monkey')
+    user_detail = User_Detail(user_id=1, restaurant_id=1, status='try')
+    notification = Notification(user_id=1, opentable_id=149515, date=x, people=6)
+    db.session.add_all(user, user_detail, notification)
+    db.session.commit()
+
 
 ##############################################################################
 # Helper functions

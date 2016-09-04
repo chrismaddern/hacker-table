@@ -10,7 +10,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask import (Flask, render_template, redirect, request, flash,
                    session, jsonify)
 
-from model import Restaurant, Opentable, Reservation, User, User_Detail, Notification, connect_to_db, db
+from model import *
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -28,7 +28,7 @@ gkey = os.environ['GOOGLE_API_KEY']
 
 
 @app.route('/')
-def index():
+def homepage():
     """Homepage."""
 
     # Check if user is logged in, if not assign None-type
@@ -37,14 +37,79 @@ def index():
     except:
         session['user_email'] = None
 
-    #query all existing reservations that are not null
-    reservations = Reservation.query.order_by('date', 'people').all()
+    return render_template("homepage.html")
+
+
+@app.route('/reservations')
+def reservations():
+    """Reservations Page"""
+
+    # Check if user is logged in, if not assign None-type
+    try:
+        session['user_email']
+    except:
+        session['user_email'] = None
+
+    #query all existing reservations
+    reservations = Reservation.get_all_reservations()
 
     #query unique dates in reservation database
-    dates = db.session.query(Reservation.date).group_by(Reservation.date).order_by(Reservation.date).all()
+    dates = Reservation.get_all_dates()
 
     # return homepage with reservations
-    return render_template("homepage.html", reservations=reservations, dates=dates, gkey=gkey)
+    return render_template("reservations.html", reservations=reservations, dates=dates, gkey=gkey)
+
+
+@app.route('/restaurant_list')
+def restaurant_list():
+    """List of all Restaurants."""
+
+    #query all restaurants in database
+    restaurants = Restaurant.get_all_restaurants()
+
+    # Check if user is logged in, if not assign None-type
+    try:
+        session['user_email']
+    except:
+        session['user_email'] = None
+
+    # Get user_id based on logged in user from session, and get details for all restaurants rated
+    if session['user_email']:
+        user_id = User.get_user_id(session['user_email'])
+        user_details = User_Detail.get_user_details(user_id)
+    else:
+        user_details = None
+
+    # return list of restaurants
+    return render_template("restaurant_list.html", restaurants=restaurants, user_details=user_details)
+
+
+@app.route('/restaurant_details/<int:restaurant_id>')
+def restaurant_details(restaurant_id):
+    """Detailed page per Restaurant."""
+
+    #query all restaurants in database
+    restaurant = db.session.query(Restaurant).filter_by(restaurant_id=restaurant_id).one()
+
+    # return detailed restaurant page
+    return render_template("restaurant_details.html", restaurant=restaurant, gkey=gkey)
+
+
+@app.route('/user')
+def user():
+    """List of all existing user notifications"""
+
+    # Check if user is logged in, if not assign None-type
+    try:
+        session['user_email']
+    except:
+        session['user_email'] = None
+
+    # Get user_id based on logged in user from session
+    user_id = User.get_user_id(session['user_email'])
+    notifications = Notification.get_user_notifications(user_id)
+
+    return render_template('user.html', notifications=notifications)
 
 
 @app.route('/create', methods=['POST'])
@@ -55,88 +120,58 @@ def create():
     user_email = request.form.get('user_email')
     password = request.form.get('password')
 
-    user = User.query.filter_by(user_email=user_email).first()
-    if user is not None:
-        flash('This user already exists.')
-    else:
+    user = User.search_user(user_email, password)
+
+    if user is None:
         user = User(user_email=user_email, password=password)
         db.session.add(user)
-        flash('Your account has been created and you are logged in.')
+        db.session.commit()
+        session['user_email'] = user.user_email
+        flash('A new user has been created')
+    else:
+        flash('This user already exists')
 
     return redirect('/')  # redirect user to homepage
-
-
-@app.route('/user')
-def user():
-    """List of all existing user notifications"""
-
-    # Get user_id based on logged in user from session
-    user_id = db.session.query(User).filter_by(user_email=session['user_email']).one().user_id
-
-    notifications = db.session.query(Notification).filter_by(user_id=user_id).all()
-
-    return render_template('user.html', notifications=notifications)  # redirect user to homepage
 
 
 @app.route('/notify', methods=['POST'])
 def notify():
     """Create Notification for Reservation"""
 
-    opentable = int(request.form.get('opentable'))
+    opentable_id = int(request.form.get('opentable'))
     date = request.form.get('date')
     date = datetime.strptime('2016 ' + date, '%Y %b%d')
     people = int(request.form.get('people'))
     user_mobile = request.form.get('user_mobile')
 
-    # Update user mobile in database
-    db.session.query(User).filter_by(user_email=session['user_email']).update({'user_phone': user_mobile})
+    # If mobile provided, update user mobile in database
+    if user_mobile:
+        User.update_mobile(session['user_email'], user_mobile)
 
     # Get user_id based on logged in user from session
-    user_id = db.session.query(User).filter_by(user_email=session['user_email']).one().user_id
+    user_id = User.get_user_id(session['user_email'])
 
-    query = db.session.query(Notification).filter(Notification.user_id == user_id,
-                                                  Notification.opentable_id == opentable,
-                                                  Notification.date == date,
-                                                  Notification.people == people)
+    msg = Notification.add_notification(user_id, opentable_id, date, people)
+    flash(msg)
 
-    # Check if user has already made notification for selected parameters
-    notification = query.first()
-
-    # Add notification to database if does not yet exist
-    if notification is not None:
-        flash('You already have an existing notification set up.')
-    else:
-        print 'Creating a notification'
-        new_notification = Notification(user_id=user_id, opentable_id=opentable,
-                                        date=date, people=people)
-        db.session.add(new_notification)
-        db.session.commit()
-        flash('You have successfully created a notification.')
-
-    return redirect('/')  # redirect user to homepage
+    return redirect('/reservations')  # redirect user to reservations page
 
 
 @app.route('/cancel', methods=['POST'])
 def cancel():
     """Delete notification from database"""
 
-    opentable = int(request.form.get('opentable'))
+    opentable_id = int(request.form.get('opentable'))
     date = request.form.get('date')
     people = int(request.form.get('people'))
 
     # Get user_id based on logged in user from session
-    user_id = db.session.query(User).filter_by(user_email=session['user_email']).one().user_id
+    user_id = User.get_user_id(session['user_email'])
 
-    notification = db.session.query(Notification).filter(Notification.user_id == user_id,
-                                                         Notification.opentable_id == opentable,
-                                                         Notification.date == date,
-                                                         Notification.people == people)
+    msg = Notification.delete_notification(user_id, opentable_id, date, people)
+    flash(msg)
 
-    notification.delete()
-    db.session.commit()
-
-    flash('You have deleted a notification.')
-    return redirect('/user')  # redirect user to homepage
+    return redirect('/user')  # redirect user to user page
 
 
 @app.route('/login', methods=['POST'])
@@ -147,7 +182,7 @@ def login():
     user_email = request.form.get('user_email')
     password = request.form.get('password')
 
-    user = User.query.filter_by(user_email=user_email).first()
+    user = User.search_user(user_email)
     if user is None:
         flash('This user does not exist.')
     else:
@@ -182,12 +217,10 @@ def update_status():
     status = request.form.get('status')
 
     # Get user_id based on logged in user from session
-    user_id = db.session.query(User).filter_by(user_email=session['user_email']).one().user_id
-
-    query = db.session.query(User_Detail).filter(User_Detail.user_id == user_id, User_Detail.restaurant_id == restaurant_id)
+    user_id = User.get_user_id(session['user_email'])
 
     # Check if user has already made selection for specified restaurant
-    user_detail = query.first()
+    user_detail = User_Detail.search_user_detail(user_id, restaurant_id)
 
     # if entry does not exist, add to database
     if user_detail is None:
@@ -205,49 +238,12 @@ def update_status():
     return jsonify(status=status, resto_id=restaurant_id)
 
 
-@app.route('/restaurant_list')
-def restaurant_list():
-    """List of all Restaurants."""
-
-    #query all restaurants in database
-    restaurants = Restaurant.query.order_by('name').all()
-
-    # Check if user is logged in, if not assign None-type
-    try:
-        session['user_email']
-    except:
-        session['user_email'] = None
-
-    # Get user_id based on logged in user from session, and get details for all restaurants rated
-    if session['user_email']:
-        user_id = db.session.query(User).filter_by(user_email=session['user_email']).one().user_id
-        user_details = db.session.query(User_Detail).filter(User_Detail.user_id==user_id, User_Detail.status!=None).all()
-    else:
-        user_details = None
-
-    print user_details
-
-    # return list of restaurants
-    return render_template("restaurant_list.html", restaurants=restaurants, user_details=user_details)
-
-
-@app.route('/restaurant_details/<int:restaurant_id>')
-def restaurant_details(restaurant_id):
-    """Detailed page per Restaurant."""
-
-    #query all restaurants in database
-    restaurant = db.session.query(Restaurant).filter_by(restaurant_id=restaurant_id).one()
-
-    # return detailed restaurant page
-    return render_template("restaurant_details.html", restaurant=restaurant, gkey=gkey)
-
-
 @app.route('/resto_markers', methods=['POST'])
 def resto_markers():
     """Provide restaurant details for homepage map in JSON format"""
 
     #query unique dates in reservation database
-    dates = db.session.query(Reservation.date).group_by(Reservation.date).order_by(Reservation.date).all()
+    dates = Reservation.get_all_dates()
 
     #parse form inputs for query
     date = request.form.get("date")
@@ -285,10 +281,7 @@ if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
     app.debug = True
-
     connect_to_db(app)
-
     # Use the DebugToolbar
     DebugToolbarExtension(app)
-
     app.run(host='0.0.0.0')
