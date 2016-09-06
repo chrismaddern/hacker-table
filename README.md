@@ -18,3 +18,23 @@ Features
 
 Screen Shots
 ------
+
+**Homepage**
+
+<img src='https://github.com/tinapastelero/hacker-table/blob/master/static/homepage.png' height=300px>
+
+**Restaurants**
+
+<img src='https://github.com/tinapastelero/hacker-table/blob/master/static/restaurants.png' height=300px>
+
+**Reservations**
+
+<img src='https://github.com/tinapastelero/hacker-table/blob/master/static/reservations.png' height=300px>
+
+**Google Map**
+
+<img src='https://github.com/tinapastelero/hacker-table/blob/master/static/googlemap.png' height=300px>
+
+**Notifications**
+
+<img src='https://github.com/tinapastelero/hacker-table/blob/master/static/notification.png' height=300px>
