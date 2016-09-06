@@ -45,4 +45,4 @@ List of all notifications for upcoming reservations that has been set up by the 
 
 Author
 ------
-Tina Pastelero is a technology and financial services professional based in San Francisco, CA.
+Tina Pastelero is based in San Francisco, CA.
