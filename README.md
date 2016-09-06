@@ -20,21 +20,25 @@ Features
 Screen Shots
 ------
 **Restaurants**
+
 All available restaurants on Hacker Brunch. Data is provided by the Yelp Search API. When a user is logged in, they have the ability to indicate whether they "want to try" a restaurant, or if they "like" or "dislike" a restaurant if they've been there in the past.
 
 <img src='https://github.com/tinapastelero/hacker-table/blob/master/static/restaurants.png'>
 
 **Reservations**
+
 Available upcoming reservations for all restaurants featured on Hacker Brunch. For restaurants that don't currently have any available reservations, users have the option to sign-up for SMS text notifications (powered by Twilio) so they get a notification as soon as Hacker Brunch knows a reservation that matches the user's preferences becomes available.
 
 <img src='https://github.com/tinapastelero/hacker-table/blob/master/static/reservations.png'>
 
 **Google Map**
+
 Users can filter restaurants based on number of people, date, and even by restaurant name. When a user clicks on "Populate Map," markers appear on the San Francisco map based on filters the user has selected.
 
 <img src='https://github.com/tinapastelero/hacker-table/blob/master/static/googlemap.png'>
 
 **Notifications**
+
 List of all notifications for upcoming reservations that has been set up by the users. As soon as a text message is sent to the user, the notification is deleted from the database so the user only receives the reminder once. Users have the ability to cancel future notifications if needed.
 
 <img src='https://github.com/tinapastelero/hacker-table/blob/master/static/notification.png'>
