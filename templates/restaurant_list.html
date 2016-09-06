@@ -7,6 +7,13 @@
   <table class="table">
     <thead>
       <tr>
+        <th><a href"http://www.yelp.com/" target="_blank"><img src='/static/yelp_button.png' style='height: 30px'></a></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>     
+      </tr>
+      <tr>
         <th></th>
         <th>Name</th>
         <th></th>
@@ -19,7 +26,7 @@
       {% for restaurant in restaurants %}  
       <tr>
         <td><img src='{{ restaurant.yelp_details[0].image_url }}' alt='{{ restaurant.name }}'><br></td>
-        <td><a href='/restaurant_details/{{ restaurant.restaurant_id }}'><b>{{ restaurant.name }}</b></a></td>
+        <td><a href='https://www.yelp.com/biz/{{ restaurant.yelp_details[0].yelp_id }}' target='_blank'><b>{{ restaurant.name }}</b></a></td>
         <td>
             {% if session['user_email'] %}
             <div class="text-center">

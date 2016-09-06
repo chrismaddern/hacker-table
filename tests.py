@@ -42,10 +42,6 @@ class HackerBrunchTests(unittest.TestCase):
         result = self.client.get("/restaurant_list")
         self.assertIn("Neighborhood", result.data)
 
-    def test_restaurant_details(self):
-        result = self.client.get("/restaurant_details/1")
-        self.assertIn("Address", result.data)
-
     def test_user(self):
         result = self.client.get("/user")
         self.assertIn("Your existing notifications", result.data)
@@ -125,10 +121,6 @@ class HackerBrunchTestsLogout(unittest.TestCase):
         result = self.client.get("/restaurant_list")
         self.assertIn("Neighborhood", result.data)
         self.assertNotIn("Want to Try", result.data)
-
-    def test_restaurant_details(self):
-        result = self.client.get("/restaurant_details/1")
-        self.assertIn("Address", result.data)
 
     def test_logout(self):
         self.client.post("/logout", follow_redirects=True)

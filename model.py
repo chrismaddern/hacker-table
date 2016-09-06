@@ -61,6 +61,14 @@ class Opentable(db.Model):
     notifications = db.relationship('Notification', backref=db.backref('opentable'))
 
 
+    @classmethod
+    def get_all_opentable_ids(cls):
+        """Get all opentable ids in database"""
+
+        opentable_id = db.session.query(Opentable.opentable_id).all()
+        return opentable_id
+
+
 class Reservation(db.Model):
     """Table containing available reservation times"""
 
@@ -260,5 +268,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
-    db.create_all()  # create all tables
+    # db.create_all()  # create all tables
     print "Connected to DB."

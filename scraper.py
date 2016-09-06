@@ -27,7 +27,7 @@ def restaurant_query():
     [16609, 1906, 4485, 10060, 13591, 13636, 15424, 19651, 28717, 43240, 48964, 49426, 52636, 107080, 114490, 146014, 149515, 149530, 151108]
     """
 
-    opentable_id = db.session.query(Opentable.opentable_id).all()
+    opentable_id = Opentable.get_all_opentable_ids()
     resto_list = []
 
     for restaurant in opentable_id:
@@ -117,7 +117,6 @@ def scrape_opentable(date_list, resto_list, person_list):
     for date in date_list:
         for resto in resto_list:
             for person in person_list:
-                print resto
                 url = 'http://opentable.com/opentables.aspx?t=rest&r=%i&d=%s%s&p=%i' % (resto, date, reservation_time, person)
                 reservation_times = scrape_reservation_times(url)  # call scrape_reservation_times function on URL
                 reservation_dict[reservation_id] = [resto, date, person, reservation_times]  # add item to dictionary per URL
@@ -173,32 +172,25 @@ def send_notifications():
     notifications = db.session.query(Notification).all()
     for notification in notifications:
         opentable_id = notification.opentable_id
-        resto_name = db.session.query(Opentable).filter(Opentable.opentable_id==opentable_id).first().name
+        resto_name = db.session.query(Opentable).filter(Opentable.opentable_id == opentable_id).first().name
         date = notification.date
         date_formatted = date.strftime('%b %-d, %a')
         people = notification.people
         user_id = notification.user_id
-        user_phone = db.session.query(User).filter(User.user_id==user_id).first().user_phone
+        user_phone = db.session.query(User).filter(User.user_id == user_id).first().user_phone
         # look for reservations that match notifications
-        reservations = db.session.query(Reservation).filter(Reservation.opentable_id==opentable_id, Reservation.date==date, Reservation.people==people).first()
+        reservations = db.session.query(Reservation).filter(Reservation.opentable_id == opentable_id, Reservation.date == date, Reservation.people == people).first()
         # if a matching reservation is found in database, send text and delete notification from database
         if reservations:
-            text_body="A table at %s for %i on %s is available on Hacker Brunch. Visit www.hackerbrunch.com to book now!" % (resto_name, people, date_formatted)
+            text_body = "A table at %s for %i on %s is available on Hacker Brunch. Visit www.hackerbrunch.com to book now!" % (resto_name, people, date_formatted)
             message = client.messages.create(body=text_body, to='+1%s' % (user_phone), from_="+12709469927")
             print(message.sid)
-            notification = db.session.query(Notification).filter(Notification.user_id == user_id,
-                                                     Notification.opentable_id == opentable_id,
-                                                     Notification.date == date,
-                                                     Notification.people == people)
+            notification = db.session.query(Notification).filter(Notification.user_id == user_id, Notification.opentable_id == opentable_id, Notification.date == date, Notification.people == people)
             notification.delete()
             db.session.commit()
 
 
-
-
-# #############################################################################
-# Helper functions
-
+#############################################################################
 
 if __name__ == "__main__":
     # User can work with database directly when run in interactive mode
@@ -206,16 +198,16 @@ if __name__ == "__main__":
     connect_to_db(app)
     print "Connected to DB."
 
-    # print arrow.utcnow().to('US/Pacific')
-    # resto_list = restaurant_query()
-    # print 'Creating date list'
-    # date_list = current_time()
-    # print 'Scraping open table'
-    # scrape_opentable(date_list, resto_list, person_list)
-    # print 'Seeding database'
-    # load_reservations()
-    # send_notifications()
-    # print arrow.utcnow().to('US/Pacific')
+    print arrow.utcnow().to('US/Pacific')
+    resto_list = restaurant_query()
+    print 'Creating date list'
+    date_list = current_time()
+    print 'Scraping open table'
+    scrape_opentable(date_list, resto_list, person_list)
+    print 'Seeding database'
+    load_reservations()
+    send_notifications()
+    print arrow.utcnow().to('US/Pacific')
 
     import doctest
     print

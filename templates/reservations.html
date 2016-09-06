@@ -59,7 +59,7 @@
   {% for reservation in reservations %}
   <tr class='reservation-entry'>
     <td>{{ reservation.date.strftime('%b %-d, %a') }}</td>
-    <td><a href='/restaurant_details/{{ reservation.opentable.restaurants[0].restaurant_id }}'>{{ reservation.opentable.name }}</a></td>
+    <td><a href='https://www.yelp.com/biz/{{ reservation.opentable.restaurants[0].yelp_details[0].yelp_id }}' target='_blank'>{{ reservation.opentable.name }}</a></td>
     <td>{{ reservation.people }}</td>
     <td>
     <!-- clean up time string for looping over -->
@@ -135,8 +135,8 @@
 
 <!-- Google Map -->
 <div class="container" style="height: 80%">
-  <button id='populate_map' type="button" class="btn btn-primary btn-xs">POPULATE MAP</button>
-  <button id='reset_map' type="button" class="btn btn-primary btn-xs">RESET MAP</button>
+  <button id='populate_map' type="button" class="btn btn-info btn-sm">POPULATE MAP</button>
+  <button id='reset_map' type="button" class="btn btn-info btn-sm">RESET MAP</button>
   <div id="homepage-map" style="height: 80%"></div>
 </div>
 

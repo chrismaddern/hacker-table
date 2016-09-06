@@ -53,10 +53,10 @@ def reservations():
     #query all existing reservations
     reservations = Reservation.get_all_reservations()
 
-    #query unique dates in reservation database
+    #query all unique dates
     dates = Reservation.get_all_dates()
 
-    # return homepage with reservations
+    # return homepage with reservations and secret google api key
     return render_template("reservations.html", reservations=reservations, dates=dates, gkey=gkey)
 
 
@@ -82,22 +82,6 @@ def restaurant_list():
 
     # return list of restaurants
     return render_template("restaurant_list.html", restaurants=restaurants, user_details=user_details)
-
-
-@app.route('/restaurant_details/<int:restaurant_id>')
-def restaurant_details(restaurant_id):
-    """Detailed page per Restaurant."""
-
-    try:
-        session['user_email']
-    except:
-        session['user_email'] = None
-
-    #query all restaurants in database
-    restaurant = db.session.query(Restaurant).filter_by(restaurant_id=restaurant_id).one()
-
-    # return detailed restaurant page
-    return render_template("restaurant_details.html", restaurant=restaurant, gkey=gkey)
 
 
 @app.route('/user')
@@ -281,7 +265,7 @@ def resto_markers():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
     connect_to_db(app)
     # Use the DebugToolbar
     DebugToolbarExtension(app)
