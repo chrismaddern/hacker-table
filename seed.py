@@ -7,7 +7,8 @@ import json
 
 
 def load_opentable():
-    """Load opentable data to database from opentable.txt file"""
+    """Load opentable data to database from opentable.txt file
+    """
 
     print "Loading Opentable data"
 

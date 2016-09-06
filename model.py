@@ -1,6 +1,7 @@
 """Models and database functions for Hacker Brunch."""
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 
 db = SQLAlchemy()
@@ -141,7 +142,7 @@ class User(db.Model):
         return user_id
 
     @classmethod
-    def search_user(cls, user_email, password):
+    def search_user(cls, user_email):
         """See if user exists in database"""
 
         user = User.query.filter_by(user_email=user_email).first()
@@ -149,7 +150,7 @@ class User(db.Model):
 
 
     @classmethod
-    def udate_mobile(cls, user_email, user_mobile):
+    def update_mobile(cls, user_email, user_mobile):
         """Update user_mobile in database"""
 
         db.session.query(User).filter_by(user_email=user_email).update({'user_phone': user_mobile})
@@ -230,21 +231,26 @@ class Notification(db.Model):
 
 
 def example_data():
-    user = User(user_email='test@gmail.com', user_phone=123456, password='monkey')
+    """Sample data for test db"""
+    restaurant = Restaurant(restaurant_id=1, opentable_id=1234, name='1300 on Fillmore', eater=True, yelp=True, timeout=True, zagat=True, michelin=True, infatuation=True, lat=37.781577, lng=-122.432174)
+    opentable = Opentable(opentable_id=1234, name='1300 on Fillmore')
+    reservation = Reservation(reservation_id=1000, opentable_id=1234, date=datetime(2016, 9, 9, 0, 0), people=4, time='{11:00,12:15,1:30}')
+    yelp_detail = Yelp_Detail(resto_name='1300 on Fillmore', yelp_id='1300', yelp_name='1300 on Fillmore', image_url='https://s3-media3.fl.yelpcdn.com/bphoto/g59iWWw05swHVr7zg3-Ixg/ms.jpg', display_phone='+1-415-771-7100', review_count=500, categories='Lounges, American (New), Venues & Event Spaces', rating=3.5, address='1300 Fillmore St Fillmore San Francisco, CA 94115', city='San Francisco', neighborhoods='Fillmore Western Addition', lat=37.781577, lng=-122.432174, reservation_url=None)
+    user = User(user_id=1, user_email='tina@gmail.com', user_phone=123456, password='password')
     user_detail = User_Detail(user_id=1, restaurant_id=1, status='try')
-    notification = Notification(user_id=1, opentable_id=149515, date=x, people=6)
-    db.session.add_all(user, user_detail, notification)
+    notification = Notification(user_id=1, opentable_id=1234, date=datetime(2016, 9, 9, 0, 0), people=6)
+    db.session.add_all([restaurant, opentable, reservation, yelp_detail, user, user_detail, notification])
     db.session.commit()
 
 
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri="postgresql:///restaurants"):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///restaurants'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     db.app = app
     db.init_app(app)
 
@@ -254,5 +260,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
-    # db.create_all()  # create all tables
+    db.create_all()  # create all tables
     print "Connected to DB."

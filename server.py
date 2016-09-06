@@ -88,6 +88,11 @@ def restaurant_list():
 def restaurant_details(restaurant_id):
     """Detailed page per Restaurant."""
 
+    try:
+        session['user_email']
+    except:
+        session['user_email'] = None
+
     #query all restaurants in database
     restaurant = db.session.query(Restaurant).filter_by(restaurant_id=restaurant_id).one()
 
@@ -98,12 +103,6 @@ def restaurant_details(restaurant_id):
 @app.route('/user')
 def user():
     """List of all existing user notifications"""
-
-    # Check if user is logged in, if not assign None-type
-    try:
-        session['user_email']
-    except:
-        session['user_email'] = None
 
     # Get user_id based on logged in user from session
     user_id = User.get_user_id(session['user_email'])
@@ -120,7 +119,7 @@ def create():
     user_email = request.form.get('user_email')
     password = request.form.get('password')
 
-    user = User.search_user(user_email, password)
+    user = User.search_user(user_email)
 
     if user is None:
         user = User(user_email=user_email, password=password)
@@ -221,6 +220,8 @@ def update_status():
 
     # Check if user has already made selection for specified restaurant
     user_detail = User_Detail.search_user_detail(user_id, restaurant_id)
+
+    query = db.session.query(User_Detail).filter(User_Detail.user_id == user_id, User_Detail.restaurant_id == restaurant_id)
 
     # if entry does not exist, add to database
     if user_detail is None:

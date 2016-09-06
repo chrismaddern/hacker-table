@@ -39,8 +39,9 @@ def restaurant_query():
 def current_time():
     """Create datetime object for current date and closest dates for Sat/Sun
 
-    Sample Output:
-    final_dates = ['08/13/2016', '08/14/2016']"""
+    >>> current_time()
+    [u'09/10/2016', u'09/11/2016', u'09/17/2016', u'09/18/2016']
+    """
 
     current_time = arrow.utcnow().to('US/Pacific')
     current_weekday = current_time.weekday()
@@ -75,7 +76,11 @@ def scrape_reservation_times(url):
     Sample url: 'XXX'
     Sample Output:
     [opentable_id, date, people, times]
-    [u'1906', u'08/13/2016', u'2', [u'12:30', u'1:00', u'11:30', u'11:45']]"""
+    [u'1906', u'08/13/2016', u'2', [u'12:30', u'1:00', u'11:30', u'11:45']]
+
+    >>> scrape_reservation_times('http://www.opentable.com/opentables.aspx?t=rest&r=149515&d=09/10/2016%2012:00:00%20PM&p=2')
+    [u'11:30', u'11:45', u'12:00', u'12:15', u'12:30']
+    """
 
     reservation_times = []
 
@@ -100,8 +105,9 @@ def scrape_reservation_times(url):
 def scrape_opentable(date_list, resto_list, person_list):
     """Create URLs for scraping, and call beautiful soup function to scrape times
 
-    Loop over list for restos, persons, dates and scra
-    Sample list of filenames = ['output_08132016_1906_2.html', 'output_08132016_1906_4.html']"""
+    Loop over list for restos, persons, dates and scrape available times
+
+    """
 
     #initialize empty dictionary for final output
     reservation_dict = {}
@@ -111,6 +117,7 @@ def scrape_opentable(date_list, resto_list, person_list):
     for date in date_list:
         for resto in resto_list:
             for person in person_list:
+                print resto
                 url = 'http://opentable.com/opentables.aspx?t=rest&r=%i&d=%s%s&p=%i' % (resto, date, reservation_time, person)
                 reservation_times = scrape_reservation_times(url)  # call scrape_reservation_times function on URL
                 reservation_dict[reservation_id] = [resto, date, person, reservation_times]  # add item to dictionary per URL
@@ -195,7 +202,6 @@ def send_notifications():
 
 if __name__ == "__main__":
     # User can work with database directly when run in interactive mode
-    from doctest import testmod
     from server import app
     connect_to_db(app)
     print "Connected to DB."
@@ -210,3 +216,10 @@ if __name__ == "__main__":
     # load_reservations()
     # send_notifications()
     # print arrow.utcnow().to('US/Pacific')
+
+    import doctest
+    print
+    result = doctest.testmod()
+    if not result.failed:
+        print "ALL TESTS PASSED. GOOD WORK!"
+    print
