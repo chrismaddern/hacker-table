@@ -7,3 +7,4 @@ secrets.sh
 *.pyc
 crontab.txt
 .coverage
+.DS_Store
