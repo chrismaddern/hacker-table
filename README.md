@@ -45,4 +45,4 @@ List of all notifications for upcoming reservations that has been set up by the 
 
 Author
 ------
-Tina Pastelero is based in San Francisco, CA.
+<a href="https://www.linkedin.com/in/tinapastelero" target="_blank">Tina Pastelero</a> is based in San Francisco, CA. 
