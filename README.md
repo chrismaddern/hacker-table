@@ -1,7 +1,7 @@
 # Hacker Brunch
 Hacker Brunch is a web app that solves the perennial weekend problem of finding a great brunch spot in San Francisco, without the long wait times. 
 
-Hacker Brunch shows available Opentable restaurant reservations for a curated list of highly sought after brunch spots in San Francisco (as written about on popular food blogs and websites like Eater, Infatuation, Zagat, Michelin Guide, Yelp, Timeout). Opentable does not have an available API, and Hacker Brunch uses a web scraper to look up available reservations on www.opentable.com for the next 4 weekends for groups of 2, 4 or 6 people.
+Hacker Brunch solves the "where should I have brunch" problem by showing available Opentable restaurant reservations for a curated list of highly sought after brunch spots in San Francisco (as written about on popular food blogs and websites like Eater, Infatuation, Zagat, Michelin Guide, Yelp, Timeout). Opentable does not have an available API, and Hacker Brunch uses a web scraper to look up available reservations on www.opentable.com for the next 2 weekends for groups of 2, 4 or 6 people.
 
 <img src='https://github.com/tinapastelero/hacker-table/blob/master/static/homepage.png'>
 
