@@ -1,5 +1,3 @@
-"""Utility file to seed restaurants database in seed_data"""
-
 from model import Restaurant, Opentable, Yelp_Detail, User, User_Detail
 from model import connect_to_db, db
 from server import app

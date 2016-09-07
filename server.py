@@ -1,5 +1,3 @@
-""" Hacker Table """
-
 import os
 import json
 from datetime import datetime
