@@ -179,7 +179,7 @@ def send_notifications():
         user_id = notification.user_id
         user_phone = db.session.query(User).filter(User.user_id == user_id).first().user_phone
         # look for reservations that match notifications
-        reservations = db.session.query(Reservation).filter(Reservation.opentable_id == opentable_id, Reservation.date == date, Reservation.people == people).first()
+        reservations = db.session.query(Reservation).filter(Reservation.opentable_id == opentable_id, Reservation.date == date, Reservation.people == people, Reservation.time != None).first()
         # if a matching reservation is found in database, send text and delete notification from database
         if reservations:
             text_body = "A table at %s for %i on %s is available on Hacker Brunch. Visit www.hackerbrunch.com to book now!" % (resto_name, people, date_formatted)
@@ -199,13 +199,13 @@ if __name__ == "__main__":
     print "Connected to DB."
 
     print arrow.utcnow().to('US/Pacific')
-    resto_list = restaurant_query()
-    print 'Creating date list'
-    date_list = current_time()
-    print 'Scraping open table'
-    scrape_opentable(date_list, resto_list, person_list)
-    print 'Seeding database'
-    load_reservations()
+    # resto_list = restaurant_query()
+    # print 'Creating date list'
+    # date_list = current_time()
+    # print 'Scraping open table'
+    # scrape_opentable(date_list, resto_list, person_list)
+    # print 'Seeding database'
+    # load_reservations()
     send_notifications()
     print arrow.utcnow().to('US/Pacific')
 
