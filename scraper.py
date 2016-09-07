@@ -6,7 +6,7 @@ from model import *
 from server import app
 import json
 from twilio.rest import TwilioRestClient
-
+ 
 # Run 'source secrets.sh in terminal
 # Get filepath for cronjob
 filepath = os.environ['FILE_PATH']

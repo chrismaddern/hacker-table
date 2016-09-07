@@ -1,5 +1,3 @@
-"""Models and database functions for Hacker Brunch."""
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
