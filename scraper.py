@@ -40,7 +40,7 @@ def current_time():
     """Create datetime object for current date and closest dates for Sat/Sun
 
     >>> current_time()
-    [u'09/10/2016', u'09/11/2016', u'09/17/2016', u'09/18/2016']
+    [u'09/17/2016', u'09/18/2016', u'09/24/2016', u'09/25/2016']
     """
 
     current_time = arrow.utcnow().to('US/Pacific')
@@ -199,13 +199,13 @@ if __name__ == "__main__":
     print "Connected to DB."
 
     print arrow.utcnow().to('US/Pacific')
-    # resto_list = restaurant_query()
-    # print 'Creating date list'
-    # date_list = current_time()
-    # print 'Scraping open table'
-    # scrape_opentable(date_list, resto_list, person_list)
-    # print 'Seeding database'
-    # load_reservations()
+    resto_list = restaurant_query()
+    print 'Creating date list'
+    date_list = current_time()
+    print 'Scraping open table'
+    scrape_opentable(date_list, resto_list, person_list)
+    print 'Seeding database'
+    load_reservations()
     send_notifications()
     print arrow.utcnow().to('US/Pacific')
 
